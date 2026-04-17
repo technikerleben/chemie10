@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Neutralisation – Gruppenarbeit Chemie 10</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blau:      #3E5668;
+      --blau-hell: #5a7a95;
+      --orange:    #D97A4A;
+      --gruen:     #7DBB6F;
+      --offwhite:  #F5F4F1;
+      --text:      #1e2d3a;
+      --shadow:    0 2px 10px rgba(0,0,0,0.10);
+    }
+
+    body {
+      font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--offwhite);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      background: var(--blau);
+      color: white;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    header h1 { font-size: 1.25rem; font-weight: 700; }
+    header p  { font-size: 0.85rem; opacity: 0.8; margin-top: 2px; }
+    .fach-badge {
+      background: var(--orange);
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    /* ─── CONTAINER ─── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 28px 24px;
+    }
+
+    /* ─── GRUPPENAUSWAHL ─── */
+    #gruppenauswahl {
+      text-align: center;
+      padding: 40px 24px;
+    }
+    #gruppenauswahl h2 {
+      font-size: 1.4rem;
+      color: var(--blau);
+      margin-bottom: 10px;
+    }
+    #gruppenauswahl p {
+      color: #555;
+      margin-bottom: 32px;
+      font-size: 1rem;
+    }
+    .gruppen-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      max-width: 500px;
+      margin: 0 auto 32px;
+    }
+    .gruppen-btn {
+      background: white;
+      border: 2px solid var(--blau);
+      color: var(--blau);
+      border-radius: 14px;
+      padding: 20px 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-height: 80px;
+      line-height: 1.4;
+    }
+    .gruppen-btn:hover, .gruppen-btn:active {
+      background: var(--blau);
+      color: white;
+    }
+    .gruppen-btn span {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 400;
+      margin-top: 4px;
+      opacity: 0.75;
+    }
+
+    /* ─── INHALT ─── */
+    #inhalt { display: none; }
+
+    .back-btn {
+      background: none;
+      border: 2px solid var(--blau);
+      color: var(--blau);
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    .back-btn:hover { background: var(--blau); color: white; }
+
+    /* ─── GRUPPENKENNUNG ─── */
+    .gruppen-kennung {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--orange);
+      color: white;
+      border-radius: 10px;
+      padding: 8px 18px;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+
+    /* ─── KARTEN ─── */
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      color: var(--blau);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card h2 .icon { font-size: 1.3rem; }
+    .card p { line-height: 1.7; margin-bottom: 10px; color: #2c3e50; }
+    .card p:last-child { margin-bottom: 0; }
+
+    /* Intro-Karte */
+    .card.intro {
+      border-left: 5px solid var(--gruen);
+    }
+    .card.intro h2 { color: #2e7d32; }
+
+    /* Info-Karte */
+    .card.info {
+      border-left: 5px solid var(--blau-hell);
+      background: #f4f8fc;
+    }
+    .info-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--blau-hell);
+      margin-bottom: 6px;
+    }
+
+    /* ─── TIPP ─── */
+    details.tipp {
+      background: #fff8e1;
+      border-left: 4px solid #f9a825;
+      border-radius: 0 10px 10px 0;
+      padding: 12px 16px;
+      margin: 14px 0 0;
+    }
+    details.tipp summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #7a5500;
+      font-size: 0.95rem;
+    }
+    details.tipp p {
+      margin-top: 8px;
+      color: #5a4000;
+      font-size: 0.93rem;
+    }
+
+    /* ─── AUFGABEN ─── */
+    .card.aufgaben { border-left: 5px solid var(--orange); }
+    .card.aufgaben h2 { color: var(--orange); }
+
+    .schritt {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #eee;
+    }
+    .schritt:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+    .schritt-nr {
+      background: var(--blau);
+      color: white;
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .schritt-inhalt { flex: 1; }
+    .schritt-titel {
+      font-weight: 700;
+      color: var(--blau);
+      margin-bottom: 4px;
+      font-size: 0.97rem;
+    }
+    .schritt-frage {
+      font-size: 0.95rem;
+      color: #2c3e50;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      border: 2px solid #d1dce6;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 15px;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 70px;
+      transition: border-color 0.2s;
+      color: var(--text);
+      background: #fafcff;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--blau);
+    }
+
+    /* ─── REFLEXION ─── */
+    .card.reflexion { border-left: 5px solid var(--gruen); }
+    .card.reflexion h2 { color: #2e7d32; }
+
+    /* ─── SPEICHERN-STATUS ─── */
+    .speicher-status {
+      font-size: 0.8rem;
+      color: var(--gruen);
+      text-align: right;
+      margin-top: 6px;
+      min-height: 18px;
+      transition: opacity 0.4s;
+    }
+
+    /* ─── PRÄSENTATIONS-BOX ─── */
+    .praesentation-box {
+      background: linear-gradient(135deg, var(--blau) 0%, var(--blau-hell) 100%);
+      color: white;
+      border-radius: 14px;
+      padding: 22px 24px;
+      margin-top: 24px;
+    }
+    .praesentation-box h3 {
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+    }
+    .praesentation-box ol {
+      margin-left: 20px;
+      line-height: 2;
+      font-size: 0.95rem;
+      opacity: 0.95;
+    }
+
+    /* ─── CHECKLISTE ─── */
+    .checklist {
+      list-style: none;
+      margin-top: 12px;
+    }
+    .checklist li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      font-size: 0.95rem;
+      color: #2c3e50;
+      cursor: pointer;
+    }
+    .check-box {
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--blau);
+      border-radius: 5px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      background: white;
+    }
+    .check-box.checked {
+      background: var(--gruen);
+      border-color: var(--gruen);
+      color: white;
+      font-size: 0.85rem;
+    }
+
+    /* ─── FORMEL-BADGE ─── */
+    .formel {
+      display: inline-block;
+      background: #e8f0fe;
+      border: 1.5px solid #90b8e0;
+      color: var(--blau);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin: 8px 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .gruppen-grid { grid-template-columns: 1fr 1fr; }
+      header { padding: 14px 16px; }
+      .container { padding: 16px; }
+      .card { padding: 16px; }
+    }
+
+    /* ─── TEXTMARKER ─── */
+    .marker-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: #f0f4f8;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+    }
+    .marker-toolbar .toolbar-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+      margin-right: 4px;
+    }
+    .marker-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 2.5px solid transparent;
+      border-radius: 20px;
+      padding: 5px 14px 5px 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      min-height: 38px;
+      white-space: nowrap;
+      background: white;
+    }
+    .marker-btn .stift { font-size: 1.1rem; line-height: 1; }
+    .marker-btn:active { transform: scale(0.96); }
+    .marker-btn.aktiv {
+      border-color: #1a1a1a !important;
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.18);
+      transform: scale(1.06);
+    }
+    .marker-btn.radieren { border-color: #ccc; color: #555; }
+    .marker-btn.radieren.aktiv { border-color: #777 !important; background: #ececec; }
+    .hl { border-radius: 3px; padding: 1px 0; cursor: pointer; transition: opacity 0.15s; }
+    .hl:hover { opacity: 0.65; }
+    #infotext-inhalt { line-height: 1.85; user-select: text; -webkit-user-select: text; }
+    .marker-hinweis {
+      font-size: 0.78rem; color: #888; font-style: italic;
+      margin-top: 10px; padding-top: 8px;
+      border-top: 1px dashed #ddd;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🧪 Neutralisation im Alltag</h1>
+    <p>Chemie Klasse 10 · Gruppenarbeit · Selbstreguliertes Lernen</p>
+  </div>
+  <div class="fach-badge">E-Kurs · NRW</div>
+</header>
+
+<!-- GRUPPENAUSWAHL -->
+<div id="gruppenauswahl" class="container">
+  <h2>Welche Gruppe bist du?</h2>
+  <p>Wähle deine Gruppennummer aus, um das Arbeitsblatt zu öffnen.</p>
+  <div class="gruppen-grid">
+    <button class="gruppen-btn" data-gruppe="1">Gruppe 1 <span>Schwimmbad</span></button>
+    <button class="gruppen-btn" data-gruppe="2">Gruppe 2 <span>Saurer Regen</span></button>
+    <button class="gruppen-btn" data-gruppe="3">Gruppe 3 <span>Gartenboden</span></button>
+    <button class="gruppen-btn" data-gruppe="4">Gruppe 4 <span>Abflussreiniger</span></button>
+  </div>
+</div>
+
+<!-- INHALT -->
+<div id="inhalt" class="container">
+
+  <button class="back-btn" id="back-btn">← Gruppenauswahl</button>
+
+  <div id="gruppen-kennung" class="gruppen-kennung"></div>
+
+  <!-- EINLEITUNGSTEXT (für alle Gruppen gleich) -->
+  <div class="card intro">
+    <h2><span class="icon">📖</span> Was ist Neutralisation? – Der Fall Sodbrennen</h2>
+    <div class="info-label">Einleitungstext – lies ihn zuerst durch</div>
+    <p>
+      Wer kennt es nicht: Nach einem üppigen Essen brennt es plötzlich hinter dem Brustbein. 
+      Dieses Sodbrennen entsteht, weil der Magen zu viel Salzsäure produziert. 
+      Magensäure ist stark sauer – ihr pH-Wert liegt bei etwa 1 bis 2.
+    </p>
+    <p>
+      Gegen Sodbrennen gibt es rezeptfreie Medikamente aus der Apotheke, 
+      die man <strong>Antazida</strong> nennt (von lateinisch <em>anti</em> = gegen, <em>acidum</em> = Säure). 
+      Bekannte Präparate sind z.B. <em>Rennie®</em> oder <em>Talcid®</em>. 
+      Ihre Wirkstoffe sind basische Salze wie <strong>Calciumcarbonat</strong>, 
+      <strong>Magnesiumhydroxid</strong> oder <strong>Aluminiumhydroxid</strong> – 
+      also Stoffe mit einem pH-Wert über 7. Wenn diese Basen auf die Magensäure treffen, reagieren sie:
+    </p>
+    <div style="text-align:center; margin: 14px 0;">
+      <span class="formel">H⁺ + OH⁻ → H₂O</span>
+    </div>
+    <p>
+      Das Wasserstoff-Ion (H⁺) der Säure und das Hydroxid-Ion (OH⁻) der Base reagieren miteinander – 
+      es entsteht Wasser. Der pH-Wert im Magen steigt leicht an, das Brennen lässt nach. 
+      Man nennt diesen Vorgang <strong>Neutralisation</strong>.
+    </p>
+    <div style="background:#fff3cd; border-left:4px solid #f0a500; border-radius:0 8px 8px 0; padding:12px 16px; margin:14px 0;">
+      <strong>⚠️ Wichtiger Hinweis:</strong> Antazida sind Medikamente – keine Hausmittel. 
+      Backpulver (Natriumhydrogencarbonat) sollte man <em>nicht</em> gegen Sodbrennen essen: 
+      Es lässt den pH-Wert im Magen unkontrolliert ansteigen, was den Magen dazu bringt, 
+      noch mehr Säure zu produzieren – das Gegenteil des gewünschten Effekts. 
+      Außerdem kann regelmäßige Einnahme den Mineralstoffhaushalt stören. 
+      Bei häufigem Sodbrennen sollte man immer <strong>Arzt oder Apotheke</strong> aufsuchen – 
+      denn dahinter können ernstere Erkrankungen stecken, 
+      und Antazida haben Wechselwirkungen mit anderen Medikamenten.
+    </div>
+    <p>
+      <strong>Das Prinzip der Neutralisation begegnet uns im Alltag weit häufiger, als wir denken.</strong> 
+      Genau das untersucht ihr jetzt in eurer Gruppe.
+    </p>
+  </div>
+
+  <!-- GRUPPENINHALT (wird per JS eingeblendet) -->
+  <div id="gruppen-inhalt"></div>
+
+  <!-- REFLEXION (für alle Gruppen gleich) -->
+  <div class="card reflexion">
+    <h2><span class="icon">🔍</span> Reflexion – Was habe ich heute gelernt?</h2>
+    <p style="font-size:0.9rem; color:#555; margin-bottom:14px;">
+      Beantworte diese Fragen in Stichpunkten – sie helfen dir, das Wesentliche zu sichern.
+    </p>
+
+    <div class="schritt">
+      <div class="schritt-nr">R1</div>
+      <div class="schritt-inhalt">
+        <div class="schritt-titel">Das war neu für mich …</div>
+        <textarea id="reflexion_1" placeholder="Schreib hier, was du heute Neues gelernt hast." rows="2"></textarea>
+      </div>
+    </div>
+
+    <div class="schritt">
+      <div class="schritt-nr">R2</div>
+      <div class="schritt-inhalt">
+        <div class="schritt-titel">Das war mir schon klar …</div>
+        <textarea id="reflexion_2" placeholder="Was wusstest du bereits?" rows="2"></textarea>
+      </div>
+    </div>
+
+    <div class="schritt">
+      <div class="schritt-nr">R3</div>
+      <div class="schritt-inhalt">
+        <div class="schritt-titel">Das verstehe ich noch nicht ganz …</div>
+        <textarea id="reflexion_3" placeholder="Wo hast du noch Fragen?" rows="2"></textarea>
+      </div>
+    </div>
+
+    <div class="speicher-status" id="speicher-status"></div>
+
+    <details class="tipp" style="margin-top:16px;">
+      <summary>💡 Tipp: So bereitet ihr die Präsentation vor</summary>
+      <p>Plant kurz, wer was vorstellt. Ihr habt etwa 2 Minuten Zeit. Jede Person sollte mindestens einen Satz beitragen.</p>
+    </details>
+  </div>
+
+  <!-- PRÄSENTATIONSHINWEIS -->
+  <div class="praesentation-box">
+    <h3>📢 Präsentation vorbereiten</h3>
+    <ol>
+      <li>Ist euer Stoff sauer oder basisch? (pH-Wert schätzen)</li>
+      <li>Was habt ihr zur Neutralisation herausgefunden?</li>
+      <li>Erklärt den Ablauf in eigenen Worten.</li>
+      <li>Nennt eine Verbindung zum Einleitungstext (Sodbrennen).</li>
+    </ol>
+  </div>
+
+</div>
+
+
+<!-- GRUPPENINHALTE als JS-Daten -->
+<script>
+// ─── TEXTMARKER-FARBEN (eine pro Aufgabe) ─────────────────────────────────────
+const HL_FARBEN = [
+  { bg: '#FFF176', rand: '#F9A825', dunkel: '#7a5800', cls: 'hl-0' }, // Gelb  – Aufgabe 1
+  { bg: '#C8F5B0', rand: '#43A047', dunkel: '#1b5e20', cls: 'hl-1' }, // Grün  – Aufgabe 2
+  { bg: '#B3E5FC', rand: '#0288D1', dunkel: '#01579b', cls: 'hl-2' }, // Blau  – Aufgabe 3
+  { bg: '#FFCDD2', rand: '#E53935', dunkel: '#b71c1c', cls: 'hl-3' }, // Rot   – Aufgabe 4
+];
+
+let aktiveFarbe = null; // null = kein Marker aktiv, 'radieren' = Radierer, 0-3 = Farbe
+
+function initHighlighter(anzahlSchritte) {
+  const toolbar = document.getElementById('marker-toolbar');
+  const infotext = document.getElementById('infotext-inhalt');
+  if (!toolbar || !infotext) return;
+
+  // Toolbar-Button-Events
+  toolbar.querySelectorAll('.marker-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const farbe = this.dataset.farbe;
+      const gleiche = (farbe === 'radieren')
+        ? aktiveFarbe === 'radieren'
+        : aktiveFarbe === parseInt(farbe);
+
+      // Toggle: nochmal klicken deaktiviert
+      if (gleiche) {
+        aktiveFarbe = null;
+        toolbar.querySelectorAll('.marker-btn').forEach(b => b.classList.remove('aktiv'));
+        return;
+      }
+      aktiveFarbe = farbe === 'radieren' ? 'radieren' : parseInt(farbe);
+      toolbar.querySelectorAll('.marker-btn').forEach(b => b.classList.remove('aktiv'));
+      this.classList.add('aktiv');
+    });
+  });
+
+  // Text markieren beim Loslassen der Maus / Touch
+  infotext.addEventListener('mouseup', markiereAuswahl);
+  infotext.addEventListener('touchend', markiereAuswahl);
+
+  // Auf bestehende Markierungen klicken → löschen (nur im Radierer-Modus)
+  infotext.addEventListener('click', function(e) {
+    if (aktiveFarbe !== 'radieren') return;
+    const hl = e.target.closest('.hl');
+    if (!hl) return;
+    // Span-Inhalt an seine Stelle setzen (unwrap)
+    const parent = hl.parentNode;
+    while (hl.firstChild) parent.insertBefore(hl.firstChild, hl);
+    parent.removeChild(hl);
+    parent.normalize();
+    speichernHighlights();
+  });
+
+  // Gespeicherte Highlights laden
+  ladenHighlights();
+}
+
+function markiereAuswahl() {
+  if (aktiveFarbe === null || aktiveFarbe === 'radieren') return;
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+
+  const infotext = document.getElementById('infotext-inhalt');
+  const range = sel.getRangeAt(0);
+  if (!infotext || !infotext.contains(range.commonAncestorContainer)) return;
+
+  const farbe = HL_FARBEN[aktiveFarbe];
+  const span = document.createElement('span');
+  span.className = 'hl ' + farbe.cls;
+  span.style.backgroundColor = farbe.bg;
+  span.style.borderBottom = '2.5px solid ' + farbe.rand;
+  span.title = 'Aufgabe ' + (aktiveFarbe + 1);
+
+  try {
+    range.surroundContents(span);
+  } catch(e) {
+    const fragment = range.extractContents();
+    span.appendChild(fragment);
+    range.insertNode(span);
+  }
+
+  sel.removeAllRanges();
+  speichernHighlights();
+}
+
+function speichernHighlights() {
+  if (!aktuelleGruppe) return;
+  const infotext = document.getElementById('infotext-inhalt');
+  if (!infotext) return;
+  try {
+    localStorage.setItem(
+      'hl_gruppe_' + aktuelleGruppe,
+      infotext.innerHTML
+    );
+  } catch(e) {}
+}
+
+function ladenHighlights() {
+  if (!aktuelleGruppe) return;
+  const infotext = document.getElementById('infotext-inhalt');
+  if (!infotext) return;
+  try {
+    const gespeichert = localStorage.getItem('hl_gruppe_' + aktuelleGruppe);
+    if (gespeichert) infotext.innerHTML = gespeichert;
+  } catch(e) {}
+}
+
+const GRUPPEN = {
+  1: {
+    titel: "Gruppe 1 – Schwimmbad 🏊",
+    thema: "Schwimmbad-Pflege",
+    infotext: `
+      <p>Ein Freibad, ein Gartenpool, ein Hallenbad – in jedem Schwimmbecken muss der pH-Wert des Wassers 
+      regelmäßig kontrolliert werden. Der ideale Bereich liegt bei <strong>pH 7,2 bis 7,6</strong> – 
+      also leicht basisch. Aber warum ist das so wichtig?</p>
+      <p>Ist das Wasser zu sauer (pH unter 7), greift es die Augen und Schleimhäute der Schwimmenden an – 
+      das typische „Augenstechen" im Freibad. Außerdem korrodiert es Metallteile des Beckens. 
+      Ist das Wasser hingegen zu basisch (pH über 8), verliert das Desinfektionsmittel Chlor seine Wirkung, 
+      Kalkablagerungen bilden sich und das Wasser wird trüb.</p>
+      <p>Bademeister messen deshalb täglich den pH-Wert. Ist er zu niedrig, geben sie 
+      <strong>Natriumcarbonat</strong> (Na₂CO₃, eine Base) ins Wasser – Neutralisation hebt den pH-Wert. 
+      Ist er zu hoch, setzen sie <strong>Salzsäure</strong> (HCl, verdünnt) ein – 
+      die Säure senkt den pH-Wert durch Neutralisation wieder ab. 
+      So wird das Wasser täglich „in Balance gehalten".</p>
+      <p><em>Interessant:</em> Auch der Chlorgehalt hängt direkt vom pH-Wert ab. 
+      Bei pH 7,2 ist Chlor etwa doppelt so wirksam wie bei pH 7,8 – 
+      ein korrekt eingestellter pH-Wert spart also auch Chemikalien.</p>
+    `,
+    schritte: [
+      {
+        titel: "Stoff einordnen",
+        frage: "Welchen pH-Wert soll Schwimmbadwasser haben? Ist das sauer, neutral oder basisch? Erkläre kurz, warum dieser Bereich gewählt wird.",
+        tipp: "Den idealen pH-Bereich findest du direkt im Infotext. Denk auch daran, was bei zu saurem oder zu basischem Wasser passiert."
+      },
+      {
+        titel: "Die Neutralisation erklären",
+        frage: "Wenn der pH-Wert zu niedrig ist (zu sauer), wird Natriumcarbonat zugegeben. Erkläre in 2–3 Sätzen, was dann chemisch passiert.",
+        tipp: "Natriumcarbonat ist eine Base. Was passiert, wenn eine Base auf saures Wasser trifft?"
+      },
+      {
+        titel: "Reaktion in Worten formulieren",
+        frage: 'Schreib die Reaktion als Satz: \u201eDas saure Wasser enth\u00e4lt \u2026 . Es reagiert mit \u2026 . Dabei \u2026 .\u201c',
+        tipp: "Vollständige Sätze helfen bei der Präsentation. Denk an H⁺ + OH⁻ → H₂O aus dem Einleitungstext."
+      },
+      {
+        titel: "Bedeutung verstehen",
+        frage: "Warum reicht es nicht, einfach einmal im Jahr den pH-Wert zu korrigieren? Erkläre, warum tägliche Kontrolle nötig ist und nenne mindestens zwei Gründe, warum ein falscher pH-Wert problematisch ist.",
+        tipp: "Was verändert den pH-Wert eines Schwimmbads täglich? (Denk an Schweiß, Regen, Chlorreaktionen, viele Badegäste...)"
+      }
+    ]
+  },
+
+  2: {
+    titel: "Gruppe 2 – Saurer Regen 🏛️",
+    thema: "Saurer Regen & Gebäude",
+    infotext: `
+      <p>Alte Kirchen, Burgen, griechische Tempel – viele historische Gebäude bestehen aus 
+      <strong>Kalkstein</strong> oder enthalten <strong>Marmor</strong>. 
+      Beide Materialien bestehen hauptsächlich aus Calciumcarbonat (CaCO₃). 
+      Seit dem 20. Jahrhundert werden diese Bauwerke durch ein chemisches Problem immer stärker beschädigt: 
+      den <strong>sauren Regen</strong>.</p>
+      <p>Wenn Schwefeldioxid (SO₂) und Stickoxide (NOₓ) aus Kraftwerken und Autos 
+      in die Atmosphäre gelangen, reagieren sie mit Wasser zu 
+      <strong>Schwefelsäure</strong> (H₂SO₄) und <strong>Salpetersäure</strong> (HNO₃). 
+      Der pH-Wert von normalem Regen liegt bei etwa 5,6 – leicht sauer. 
+      Saurer Regen kann aber Werte von <strong>pH 4 bis 4,5</strong> erreichen.</p>
+      <p>Wenn dieser saure Regen auf Kalkstein trifft, kommt es zur Neutralisation: 
+      Die Säure reagiert mit dem Calciumcarbonat. Dabei entsteht Calciumsulfat (Gips) – 
+      ein wasserlösliches Salz, das vom nächsten Regen weggespült wird. 
+      Der Stein löst sich also langsam auf. Details, Reliefs und Inschriften verschwinden.</p>
+      <p><em>Beispiel:</em> Der Kölner Dom verliert messbar Steinmaterial durch Säureangriff. 
+      In Griechenland wurden die Originalfiguren des Parthenon ins Museum geholt und durch Kopien ersetzt.</p>
+    `,
+    schritte: [
+      {
+        titel: "Stoff einordnen",
+        frage: "Warum ist saurer Regen für Kalksteingebäude gefährlich? Schreib den pH-Wert von saurem Regen auf und erkläre, was der Unterschied zu normalem Regen ist.",
+        tipp: "Den pH-Wert von normalem und saurem Regen findest du im Infotext."
+      },
+      {
+        titel: "Die Neutralisation erklären",
+        frage: "Was passiert chemisch, wenn Schwefelsäure auf Kalkstein (CaCO₃) trifft? Erkläre in 2–3 Sätzen, was dabei entsteht und warum das den Stein zerstört.",
+        tipp: "Säure + Base → Salz + Wasser. Calciumcarbonat ist die Base. Was ist die Säure? Was ist das Salz?"
+      },
+      {
+        titel: "Reaktion in Worten formulieren",
+        frage: 'Schreib die Reaktion als Satz: \u201eDie Schwefels\u00e4ure im Regen reagiert mit \u2026 . Dabei entsteht \u2026 . Folge f\u00fcr das Geb\u00e4ude: \u2026 .\u201c',
+        tipp: "Vollständige Sätze helfen euch später bei der Präsentation."
+      },
+      {
+        titel: "Lösungsansätze überlegen",
+        frage: "Wie könnte man historische Gebäude aus Kalkstein schützen? Überlegt mindestens zwei Möglichkeiten und erklärt jeweils kurz, wie sie chemisch oder praktisch funktionieren könnten.",
+        tipp: "Denkt an: Schutzschichten, Maßnahmen gegen sauren Regen an der Quelle, Restaurierung... Was würde helfen?"
+      }
+    ]
+  },
+
+  3: {
+    titel: "Gruppe 3 – Übersäuerter Gartenboden 🌱",
+    thema: "Gartenboden",
+    infotext: `
+      <p>Ein Bauer testet seinen Ackerboden mit einem pH-Messgerät – und stellt fest: 
+      Der Boden hat einen pH-Wert von <strong>4,5</strong>. Das ist deutlich zu sauer für die meisten Nutzpflanzen. 
+      Mais, Weizen oder Kartoffeln wachsen schlecht, wenn der Boden zu sauer ist – 
+      sie können wichtige Nährstoffe nicht mehr aufnehmen.</p>
+      <p>Die Lösung des Landwirts: Er streut <strong>Kalk</strong> (Calciumcarbonat, CaCO₃) auf den Boden. 
+      Kalk reagiert basisch und hat einen pH-Wert von etwa 9 bis 10 in wässriger Lösung. 
+      Im feuchten Boden löst sich der Kalk auf und reagiert mit den sauren Bestandteilen des Bodens – 
+      es kommt zur Neutralisation. Der pH-Wert steigt langsam in Richtung 6 bis 7 – 
+      den idealen Bereich für die meisten Kulturpflanzen.</p>
+      <p>Diesen Vorgang nennt man auch <strong>Kalkung des Bodens</strong>. 
+      Er ist seit Jahrhunderten bekannt und wird in der Landwirtschaft weltweit eingesetzt.</p>
+    `,
+    schritte: [
+      {
+        titel: "Stoff einordnen",
+        frage: "Warum ist ein pH-Wert von 4,5 für Pflanzen ein Problem? Nenne den ungefähren pH-Wert, den Pflanzen brauchen, und erkläre den Unterschied.",
+        tipp: "Den idealen pH-Wert für Kulturpflanzen findest du im Infotext."
+      },
+      {
+        titel: "Das Mittel erklären",
+        frage: "Warum hilft Kalk gegen übersäuerten Boden? Erkläre in 2–3 Sätzen, was chemisch passiert.",
+        tipp: "Ist Kalk sauer oder basisch? Was passiert, wenn er auf den sauren Boden trifft?"
+      },
+      {
+        titel: "Reaktion in Worten formulieren",
+        frage: 'Schreib die Reaktion als Satz auf: \u201eDer saure Boden enth\u00e4lt \u2026 . Er reagiert mit \u2026 . Dabei steigt \u2026 .\u201c',
+        tipp: "Vollständige Sätze helfen euch später bei der Präsentation."
+      },
+      {
+        titel: "Alltagsverbindung",
+        frage: "Nenne ein weiteres Beispiel, bei dem Menschen aktiv etwas neutralisieren – entweder im Haushalt, in der Medizin oder in der Industrie. Erkläre kurz, was dort sauer oder basisch ist.",
+        tipp: "Denkt an den Einleitungstext über Sodbrennen. Gibt es ähnliche Situationen in anderen Bereichen?"
+      }
+    ]
+  },
+
+  4: {
+    titel: "Gruppe 4 – Abflussreiniger ⚠️",
+    thema: "Abflussreiniger",
+    infotext: `
+      <p>Im Drogeriemarkt steht ein Flakon mit der Aufschrift: <em>„Rohr frei – Kraftvoll gegen Verstopfungen"</em>. 
+      Der Wirkstoff ist meist <strong>Natriumhydroxid (NaOH)</strong>, im Volksmund auch Natronlauge oder Ätznatron genannt. 
+      Der pH-Wert eines solchen Reinigers liegt bei <strong>13 bis 14</strong> – das ist extrem basisch.</p>
+      <p>Natriumhydroxid löst Fette, Haare und organische Ablagerungen auf, die den Abfluss verstopfen. 
+      Es ist chemisch äußerst reaktiv. Auf der Haut verursacht es schwere Verätzungen, 
+      weil es die Zellen direkt angreift. Das ist auch der Grund, warum solche Produkte 
+      mit deutlichen Warnhinweisen und dem Gefahrsymbol „Ätzend" versehen sind.</p>
+      <p>Wenn ein Spritzer auf die Haut gelangt, lautet die erste Maßnahme: 
+      <strong>Sofort mit viel Wasser abspülen.</strong> 
+      Das verdünnt die Lauge stark. Eine vollständige Neutralisation mit einer Säure 
+      (z.B. Essig) wird in solchen Notfallsituationen <em>nicht empfohlen</em> – 
+      denn die entstehende Reaktion kann zusätzliche Wärme erzeugen und den Schaden verschlimmern.</p>
+    `,
+    schritte: [
+      {
+        titel: "Stoff einordnen",
+        frage: "Ist Abflussreiniger sauer oder basisch? Schreib den pH-Wert auf und erkläre kurz, was das über den Stoff aussagt.",
+        tipp: "Erinnere dich an das digitale Experiment: Was bedeutet ein pH-Wert über 7? Und über 12?"
+      },
+      {
+        titel: "Gefährlichkeit erklären",
+        frage: "Warum ist ein extremer pH-Wert (sehr sauer oder sehr basisch) gefährlich für den menschlichen Körper? Erkläre in 2–3 Sätzen.",
+        tipp: "Denk daran: Die Haut und die Zellen des Körpers arbeiten bei einem pH-Wert von ca. 7. Was passiert, wenn ein sehr starke Base daran kommt?"
+      },
+      {
+        titel: "Erste Hilfe verstehen",
+        frage: "Im Notfall spült man die Haut mit viel Wasser – aber neutralisiert nicht mit Essig. Warum ist das so? Erkläre den Unterschied zwischen Verdünnen und Neutralisieren.",
+        tipp: "Überlegt: Was passiert bei einer Neutralisation? Kann diese Reaktion selbst auch Energie freisetzen?"
+      },
+      {
+        titel: "Reflektion: Grenzen der Neutralisation",
+        frage: "In welchen Situationen ist Neutralisation sinnvoll (wie beim Sodbrennen oder Bienenstich) – und wann ist sie keine gute Lösung? Nenne Beispiele aus dem Unterricht.",
+        tipp: "Vergleicht euren Fall mit denen der anderen Gruppen: Wann hat Neutralisation geholfen? Wann war Vorsicht nötig?"
+      }
+    ]
+  }
+};
+
+let aktuelleGruppe = null;
+
+function zeigeGruppe(nr) {
+  aktuelleGruppe = nr;
+  const gruppe = GRUPPEN[nr];
+
+  document.getElementById('gruppenauswahl').style.display = 'none';
+  document.getElementById('inhalt').style.display = 'block';
+
+  // Kennung
+  document.getElementById('gruppen-kennung').textContent = gruppe.titel;
+
+  // Inhalt aufbauen
+  const container = document.getElementById('gruppen-inhalt');
+  container.innerHTML = `
+    <div class="card info">
+      <div class="info-label">📄 Infotext – Lies diesen Text sorgfältig durch, bevor du die Aufgaben bearbeitest</div>
+      <h2 style="margin-bottom:10px;"><span class="icon">🔬</span> Dein Fall: ${gruppe.thema}</h2>
+
+      <div class="marker-toolbar" id="marker-toolbar">
+        <span class="toolbar-label">🖊 Markieren:</span>
+        ${gruppe.schritte.map((s, i) => `
+          <button class="marker-btn" data-farbe="${i}" style="background:${HL_FARBEN[i].bg}; border-color:${HL_FARBEN[i].rand};" title="Aufgabe ${i+1}: ${s.titel}">
+            <span class="stift">✏️</span> Aufgabe ${i + 1}
+          </button>
+        `).join('')}
+        <button class="marker-btn radieren" data-farbe="radieren" title="Markierung entfernen">
+          <span class="stift">🧹</span> Löschen
+        </button>
+      </div>
+
+      <div id="infotext-inhalt">${gruppe.infotext}</div>
+      <p class="marker-hinweis">💡 Tipp: Text auswählen, dann Aufgaben-Farbe klicken – auf eine Markierung klicken mit „Löschen" entfernt sie.</p>
+    </div>
+
+    <div class="card aufgaben">
+      <h2><span class="icon">✏️</span> Aufgaben – Schritt für Schritt</h2>
+      <p style="font-size:0.88rem; color:#888; margin-bottom:16px;">
+        Bearbeite die Schritte der Reihe nach. Du kannst Tipps aufklappen, wenn du nicht weiterkommst.
+      </p>
+      ${gruppe.schritte.map((s, i) => `
+        <div class="schritt">
+          <div class="schritt-nr" style="background:${HL_FARBEN[i].dunkel};">${i + 1}</div>
+          <div class="schritt-inhalt">
+            <div class="schritt-titel" style="color:${HL_FARBEN[i].dunkel};">${s.titel}</div>
+            <div class="schritt-frage">${s.frage}</div>
+            <textarea id="antwort_${i}" placeholder="Deine Antwort …" rows="3"
+              oninput="speichern()"></textarea>
+            <details class="tipp">
+              <summary>💡 Tipp anzeigen</summary>
+              <p>${s.tipp}</p>
+            </details>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  // Highlighter initialisieren
+  initHighlighter(gruppe.schritte.length);
+
+  // Gespeicherte Daten laden
+  laden(nr);
+
+  // Reflexionsfelder mit Speichern verknüpfen
+  ['reflexion_1','reflexion_2','reflexion_3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', speichern);
+  });
+
+  window.scrollTo(0, 0);
+}
+
+function zurueck() {
+  aktiveFarbe = null;
+  document.getElementById('gruppenauswahl').style.display = 'block';
+  document.getElementById('inhalt').style.display = 'none';
+}
+
+function speichern() {
+  if (!aktuelleGruppe) return;
+  const gruppe = GRUPPEN[aktuelleGruppe];
+  const daten = {};
+
+  gruppe.schritte.forEach((_, i) => {
+    const el = document.getElementById(`antwort_${i}`);
+    if (el) daten[`antwort_${i}`] = el.value;
+  });
+
+  ['reflexion_1','reflexion_2','reflexion_3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) daten[id] = el.value;
+  });
+
+  try {
+    localStorage.setItem(`neutralisation_gruppe_${aktuelleGruppe}`, JSON.stringify(daten));
+  } catch(e) {}
+
+  const status = document.getElementById('speicher-status');
+  if (status) {
+    status.textContent = '✓ Gespeichert';
+    setTimeout(() => { status.textContent = ''; }, 2000);
+  }
+}
+
+function laden(nr) {
+  try {
+    const raw = localStorage.getItem(`neutralisation_gruppe_${nr}`);
+    if (!raw) return;
+    const daten = JSON.parse(raw);
+
+    Object.entries(daten).forEach(([id, wert]) => {
+      const el = document.getElementById(id);
+      if (el) el.value = wert;
+    });
+  } catch(e) {}
+}
+
+// Event-Listener für Gruppenauswahl und Zurück-Button
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.gruppen-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      zeigeGruppe(parseInt(this.dataset.gruppe));
+    });
+  });
+  const backBtn = document.getElementById('back-btn');
+  if (backBtn) backBtn.addEventListener('click', zurueck);
+});
+</script>
+
+</body>
+</html>

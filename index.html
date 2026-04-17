@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Chemie 10 – E-Kurs</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blau:      #3E5668;
+      --blau-hell: #5a7a95;
+      --blau-tief: #2a3d4d;
+      --orange:    #D97A4A;
+      --gruen:     #7DBB6F;
+      --offwhite:  #F5F4F1;
+      --text:      #1e2d3a;
+      --shadow:    0 2px 12px rgba(0,0,0,0.10);
+    }
+
+    body {
+      font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--offwhite);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      background: var(--blau-tief);
+      color: white;
+      padding: 0 32px;
+    }
+    .header-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 22px 0 18px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .header-titel h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .header-titel p {
+      font-size: 0.88rem;
+      opacity: 0.7;
+      margin-top: 3px;
+    }
+    .fach-badge {
+      background: var(--orange);
+      color: white;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 20px;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      align-self: center;
+    }
+
+    /* ─── FORTSCHRITTSLEISTE ─── */
+    .progress-bar-wrap {
+      background: var(--blau);
+      padding: 0 32px;
+    }
+    .progress-bar-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .progress-label {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.75);
+      white-space: nowrap;
+    }
+    .progress-track {
+      flex: 1;
+      height: 6px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--gruen);
+      border-radius: 3px;
+      transition: width 0.6s ease;
+      width: 0%;
+    }
+    .progress-count {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.75);
+      white-space: nowrap;
+    }
+
+    /* ─── MAIN ─── */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+
+    /* ─── KAPITEL-GRUPPE ─── */
+    .kapitel {
+      margin-bottom: 36px;
+    }
+    .kapitel-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .kapitel-nr {
+      background: var(--blau);
+      color: white;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      letter-spacing: 0.05em;
+    }
+    .kapitel-titel {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--blau);
+    }
+    .kapitel-linie {
+      flex: 1;
+      height: 1px;
+      background: #dde4ea;
+    }
+
+    /* ─── EINHEITEN-GRID ─── */
+    .einheiten-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    /* ─── EINHEITEN-KARTE ─── */
+    .einheit {
+      background: white;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.18s, box-shadow 0.18s;
+      position: relative;
+    }
+    .einheit.aktiv {
+      cursor: pointer;
+    }
+    .einheit.aktiv:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(62,86,104,0.18);
+    }
+    .einheit.aktiv:active {
+      transform: translateY(-1px);
+    }
+    .einheit.gesperrt {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    .einheit.erledigt {
+      border: 2px solid var(--gruen);
+    }
+
+    .einheit-streifen {
+      height: 5px;
+      background: var(--blau);
+    }
+    .einheit.aktiv .einheit-streifen  { background: var(--orange); }
+    .einheit.erledigt .einheit-streifen { background: var(--gruen); }
+    .einheit.gesperrt .einheit-streifen { background: #ccc; }
+
+    .einheit-body {
+      padding: 16px 18px 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .einheit-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .einheit-datum {
+      font-size: 0.75rem;
+      color: #888;
+      font-weight: 500;
+    }
+    .einheit-status {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 10px;
+      letter-spacing: 0.03em;
+    }
+    .status-heute  { background: #fff3e0; color: #bf6000; }
+    .status-offen  { background: #e8f0fe; color: #1a56a0; }
+    .status-ok     { background: #e8f5e9; color: #2e7d32; }
+    .status-bald   { background: #f5f5f5; color: #888; }
+
+    .einheit-thema {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .einheit-beschr {
+      font-size: 0.83rem;
+      color: #5a6e7f;
+      line-height: 1.5;
+    }
+
+    .einheit-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .tag {
+      font-size: 0.7rem;
+      background: #eef2f6;
+      color: #4a6278;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-weight: 600;
+    }
+
+    .einheit-footer {
+      border-top: 1px solid #f0f0f0;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .einheit-link {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--orange);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .einheit.gesperrt .einheit-link { color: #aaa; }
+    .einheit.erledigt .einheit-link { color: var(--gruen); }
+    .schloss { font-size: 0.9rem; }
+
+    /* Heute-Puls */
+    .heute-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--orange);
+      animation: puls 1.4s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes puls {
+      0%,100% { transform: scale(1); opacity: 1; }
+      50%      { transform: scale(1.5); opacity: 0.6; }
+    }
+
+    /* ─── LEGENDE ─── */
+    .legende {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 28px;
+      padding: 12px 16px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .legende-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.78rem;
+      color: #555;
+    }
+    .legende-dot {
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* ─── PLATZHALTER ─── */
+    .platzhalter {
+      background: #f8f9fb;
+      border: 2px dashed #dde4ea;
+      border-radius: 14px;
+      padding: 24px 18px;
+      color: #aaa;
+      font-size: 0.85rem;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 600px) {
+      header { padding: 0 16px; }
+      main { padding: 20px 14px 40px; }
+      .einheiten-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-titel">
+      <h1>⚗️ Chemie – E-Kurs Klasse 10</h1>
+      <p>Lernmaterialien &amp; Unterrichtseinheiten · HBG Dortmund · NRW</p>
+    </div>
+    <div class="fach-badge">E-Kurs · Klasse 10</div>
+  </div>
+</header>
+
+<div class="progress-bar-wrap">
+  <div class="progress-bar-inner">
+    <span class="progress-label">Fortschritt</span>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <span class="progress-count" id="progress-count">0 / 0 erledigt</span>
+  </div>
+</div>
+
+<main>
+
+  <!-- Legende -->
+  <div class="legende">
+    <div class="legende-item"><div class="legende-dot" style="background:var(--orange);"></div> Heute / Aktuell</div>
+    <div class="legende-item"><div class="legende-dot" style="background:var(--blau-hell);"></div> Offen</div>
+    <div class="legende-item"><div class="legende-dot" style="background:var(--gruen);"></div> Erledigt</div>
+    <div class="legende-item"><div class="legende-dot" style="background:#ccc;"></div> Noch gesperrt</div>
+  </div>
+
+  <!-- ═══ KAPITEL 1: SÄUREN UND BASEN ═══ -->
+  <div class="kapitel">
+    <div class="kapitel-header">
+      <span class="kapitel-nr">Kapitel 1</span>
+      <span class="kapitel-titel">Säuren, Basen &amp; Neutralisation</span>
+      <div class="kapitel-linie"></div>
+    </div>
+
+    <div class="einheiten-grid" id="grid-kap1">
+
+      <!-- Einheit 1 – Neutralisation (HEUTE, aktiv) -->
+      <div class="einheit aktiv" id="e-neutralisation" data-url="neutralisation_gruppenarbeit.html">
+        <div class="einheit-streifen"></div>
+        <div class="einheit-body">
+          <div class="einheit-meta">
+            <span class="einheit-datum">17.04.2026</span>
+            <span class="einheit-status status-heute">● Heute</span>
+          </div>
+          <div class="einheit-thema">Neutralisation im Alltag</div>
+          <div class="einheit-beschr">
+            Gruppenarbeit: Wie reagieren Säuren und Basen miteinander?
+            Vier Alltagsbeispiele – von Schwimmbad bis Saurer Regen.
+          </div>
+          <div class="einheit-tags">
+            <span class="tag">Gruppenarbeit</span>
+            <span class="tag">Säure + Base</span>
+            <span class="tag">pH-Wert</span>
+            <span class="tag">SRL</span>
+          </div>
+        </div>
+        <div class="einheit-footer">
+          <div class="heute-dot"></div>
+          <span class="einheit-link">Zum Material →</span>
+        </div>
+      </div>
+
+      <!-- Einheit 2 – pH Skala (vorherige Stunde, extern) -->
+      <div class="einheit erledigt" id="e-ph-skala" data-url="https://phet.colorado.edu/de/simulations/ph-scale" data-extern="true">
+        <div class="einheit-streifen"></div>
+        <div class="einheit-body">
+          <div class="einheit-meta">
+            <span class="einheit-datum">vor 17.04.2026</span>
+            <span class="einheit-status status-ok">✓ Erledigt</span>
+          </div>
+          <div class="einheit-thema">pH Skala</div>
+          <div class="einheit-beschr">
+            Digitales Experiment: pH-Wert verschiedener Flüssigkeiten bestimmen und auf der Skala einordnen.
+          </div>
+          <div class="einheit-tags">
+            <span class="tag">Simulation</span>
+            <span class="tag">pH-Skala 0–14</span>
+            <span class="tag">Alltagsstoffe</span>
+            <span class="tag">Experiment</span>
+          </div>
+        </div>
+        <div class="einheit-footer">
+          <span style="font-size:0.75rem; color:#aaa;">🔗 Externer Link</span>
+          <span class="einheit-link">Nochmal öffnen →</span>
+        </div>
+      </div>
+
+      <!-- Platzhalter für kommende Einheiten -->
+      <div class="platzhalter">
+        ＋ Weitere Einheit folgt
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ KAPITEL 2: PLATZHALTER ═══ -->
+  <div class="kapitel">
+    <div class="kapitel-header">
+      <span class="kapitel-nr">Kapitel 2</span>
+      <span class="kapitel-titel">Folgt in Kürze</span>
+      <div class="kapitel-linie"></div>
+    </div>
+    <div class="einheiten-grid">
+      <div class="platzhalter">⏳ Noch kein Inhalt – wird ergänzt</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // ─── EINHEITEN-DATEN (Status & URLs) ─────────────────────────────────────────
+  // Zum Ergänzen: weitere Einträge einfach in dieses Array schreiben.
+  const EINHEITEN = [
+    {
+      id: 'e-neutralisation',
+      url: 'neutralisation_gruppenarbeit.html',
+      extern: false,
+      erledigt: false
+    },
+    {
+      id: 'e-ph-skala',
+      url: 'https://phet.colorado.edu/de/simulations/ph-scale',
+      extern: true,
+      erledigt: true  // bereits durchgeführt
+    }
+    // Weitere Einheiten hier ergänzen:
+    // { id: 'e-titration', url: 'titration.html', extern: false, erledigt: false },
+  ];
+
+  // ─── FORTSCHRITT AUS LOCALSTORAGE ────────────────────────────────────────────
+  function ladeErledigt() {
+    try {
+      const raw = localStorage.getItem('chemie10_erledigt');
+      return raw ? JSON.parse(raw) : {};
+    } catch(e) { return {}; }
+  }
+
+  function speichereErledigt(id) {
+    const daten = ladeErledigt();
+    daten[id] = true;
+    try { localStorage.setItem('chemie10_erledigt', JSON.stringify(daten)); } catch(e) {}
+  }
+
+  function aktualisiereProgress() {
+    const erledigt = ladeErledigt();
+    const gesamt = EINHEITEN.length;
+    const done   = EINHEITEN.filter(e => erledigt[e.id]).length;
+    const pct    = gesamt > 0 ? Math.round((done / gesamt) * 100) : 0;
+
+    document.getElementById('progress-fill').style.width  = pct + '%';
+    document.getElementById('progress-count').textContent = `${done} / ${gesamt} erledigt`;
+
+    // Erledigt-Karten visuell markieren
+    EINHEITEN.forEach(e => {
+      if (erledigt[e.id]) {
+        const el = document.getElementById(e.id);
+        if (el) {
+          el.classList.add('erledigt');
+          const statusEl = el.querySelector('.einheit-status');
+          if (statusEl) { statusEl.textContent = '✓ Erledigt'; statusEl.className = 'einheit-status status-ok'; }
+          const linkEl = el.querySelector('.einheit-link');
+          if (linkEl) linkEl.textContent = '✓ Nochmal öffnen →';
+          const dot = el.querySelector('.heute-dot');
+          if (dot) dot.style.display = 'none';
+        }
+      }
+    });
+  }
+
+  // ─── KLICK-NAVIGATION ────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', function() {
+    aktualisiereProgress();
+
+    EINHEITEN.forEach(function(einheit) {
+      const el = document.getElementById(einheit.id);
+      if (!el) return;
+      el.addEventListener('click', function() {
+        if (!einheit.extern) speichereErledigt(einheit.id);
+        if (einheit.extern) {
+          window.open(einheit.url, '_blank');
+        } else {
+          window.location.href = einheit.url;
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
