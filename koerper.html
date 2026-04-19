@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>pH-Wert – Haut & Drogerieprodukte</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blau:      #3E5668;
+      --blau-hell: #5a7a95;
+      --blau-tief: #2a3d4d;
+      --orange:    #D97A4A;
+      --gruen:     #7DBB6F;
+      --offwhite:  #F5F4F1;
+      --text:      #1e2d3a;
+      --shadow:    0 2px 10px rgba(0,0,0,0.09);
+
+      --plan-bg:     #e8f0fe;
+      --plan-rand:   #4a7fd4;
+      --plan-text:   #1a3a7a;
+      --do-bg:       #fff8e1;
+      --do-rand:     #f9a825;
+      --do-text:     #5a3e00;
+      --reflect-bg:  #e8f5e9;
+      --reflect-rand:#43a047;
+      --reflect-text:#1b5e20;
+    }
+
+    body {
+      font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--offwhite);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      background: var(--blau-tief);
+      color: white;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    header h1 { font-size: 1.15rem; font-weight: 700; }
+    header p  { font-size: 0.82rem; opacity: 0.75; margin-top: 2px; }
+    .fach-badge {
+      background: var(--orange);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    /* ─── PHASENLEISTE ─── */
+    .phasen-leiste {
+      background: var(--blau);
+      padding: 10px 32px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      overflow-x: auto;
+    }
+    .phase-pip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.45);
+      white-space: nowrap;
+      transition: color 0.3s;
+    }
+    .phase-pip.aktiv  { color: white; }
+    .phase-pip.fertig { color: var(--gruen); }
+    .phase-dot {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem;
+      transition: background 0.3s;
+    }
+    .phase-pip.aktiv  .phase-dot { background: var(--orange); color: white; }
+    .phase-pip.fertig .phase-dot { background: var(--gruen);  color: white; }
+    .phase-pfeil { color: rgba(255,255,255,0.25); font-size: 0.8rem; margin: 0 1px; }
+
+    /* ─── CONTAINER ─── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+
+    /* ─── SCREENS ─── */
+    .screen { display: none; }
+    .screen.aktiv { display: block; animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    /* ─── SRL-BANNER ─── */
+    .srl-banner {
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .srl-banner.planen  { background: var(--plan-bg);    border-left: 5px solid var(--plan-rand); }
+    .srl-banner.tun     { background: var(--do-bg);      border-left: 5px solid var(--do-rand); }
+    .srl-banner.reflek  { background: var(--reflect-bg); border-left: 5px solid var(--reflect-rand); }
+    .srl-icon { font-size: 1.8rem; flex-shrink: 0; line-height: 1; }
+    .srl-text h3 { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+    .srl-text p  { font-size: 0.85rem; line-height: 1.5; margin: 0; }
+    .planen .srl-text h3, .planen .srl-text p  { color: var(--plan-text); }
+    .tun    .srl-text h3, .tun    .srl-text p  { color: var(--do-text); }
+    .reflek .srl-text h3, .reflek .srl-text p  { color: var(--reflect-text); }
+
+    /* ─── KARTEN ─── */
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 22px 24px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+    .card > h2 {
+      font-size: 1.02rem;
+      color: var(--blau);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card p {
+      font-size: 0.93rem;
+      line-height: 1.75;
+      color: #2c3e50;
+      margin-bottom: 8px;
+    }
+    .card p:last-child { margin-bottom: 0; }
+    .card.info { border-left: 5px solid var(--blau-hell); background: #f4f8fc; }
+
+    /* ─── VORWISSEN ─── */
+    .vw-box {
+      background: var(--plan-bg);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+    .vw-box label { font-size: 0.87rem; font-weight: 700; color: var(--plan-text); display: block; margin-bottom: 7px; }
+    .vw-box.warn  { background: #fff3e0; }
+    .vw-box.warn label { color: #7a5500; }
+
+    /* ─── ZIELE ─── */
+    .ziele { display: flex; flex-direction: column; gap: 9px; margin-top: 10px; }
+    .ziel-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 14px;
+      border-radius: 9px;
+      border: 2px solid #dde4ea;
+      background: white;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.15s;
+    }
+    .ziel-item.checked { border-color: var(--gruen); background: #e8f5e9; }
+    .ziel-box {
+      width: 22px; height: 22px;
+      border: 2px solid #aaa;
+      border-radius: 5px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      transition: all 0.15s;
+    }
+    .ziel-item.checked .ziel-box { background: var(--gruen); border-color: var(--gruen); color: white; }
+
+    /* ─── INFOTEXT + MARKER ─── */
+    .info-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--blau-hell); margin-bottom: 10px; }
+
+    .marker-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+      background: #e6eef5;
+      border-radius: 9px;
+      padding: 8px 12px;
+      margin-bottom: 14px;
+    }
+    .marker-toolbar .tlabel { font-size: 0.72rem; font-weight: 700; color: #556; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; }
+    .marker-btn {
+      display: flex; align-items: center; gap: 5px;
+      border: 2px solid transparent;
+      border-radius: 16px;
+      padding: 4px 12px 4px 8px;
+      font-size: 0.78rem; font-weight: 700;
+      cursor: pointer;
+      min-height: 34px;
+      background: white;
+      transition: all 0.15s;
+    }
+    .marker-btn.aktiv { border-color: #111 !important; box-shadow: 0 0 0 2px rgba(0,0,0,0.14); transform: scale(1.05); }
+    .marker-btn.radieren { border-color: #ccc; color: #555; }
+    .hl { border-radius: 3px; padding: 1px 0; cursor: pointer; transition: opacity 0.15s; }
+    .hl:hover { opacity: 0.65; }
+    #infotext-inhalt { line-height: 1.85; user-select: text; -webkit-user-select: text; font-size: 0.93rem; color: #2c3e50; }
+    #infotext-inhalt p { margin-bottom: 10px; }
+    #infotext-inhalt p:last-child { margin-bottom: 0; }
+    .marker-hinweis { font-size: 0.73rem; color: #999; font-style: italic; margin-top: 10px; padding-top: 8px; border-top: 1px dashed #ddd; }
+
+    /* Körperbereich-Boxen im Infotext */
+    .koerper-vergleich {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 10px;
+      margin: 14px 0;
+    }
+    .kb-box {
+      border-radius: 10px;
+      padding: 12px 14px;
+      border: 2px solid transparent;
+    }
+    .kb-box.haut    { background: #fce4ec; border-color: #e91e63; }
+    .kb-box.magen   { background: #fbe9e7; border-color: #e64a19; }
+    .kb-box.blut    { background: #e8f5e9; border-color: #43a047; }
+    .kb-box.speichel{ background: #e3f2fd; border-color: #1e88e5; }
+    .kb-box .kb-titel { font-size: 0.8rem; font-weight: 800; margin-bottom: 4px; }
+    .kb-box .kb-ph    { font-size: 1.1rem; font-weight: 900; font-family: 'Courier New', monospace; }
+    .kb-box .kb-info  { font-size: 0.77rem; margin-top: 3px; opacity: 0.85; }
+
+    /* ─── SCHRITTE ─── */
+    .schritt {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 16px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .schritt:last-child { border-bottom: none; padding-bottom: 0; }
+    .schritt-nr {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.95rem;
+      flex-shrink: 0; margin-top: 2px;
+      color: #333;
+    }
+    .schritt-inhalt { flex: 1; }
+    .schritt-titel { font-weight: 700; color: var(--blau); margin-bottom: 4px; font-size: 0.95rem; }
+    .schritt-frage { font-size: 0.92rem; color: #2c3e50; line-height: 1.6; margin-bottom: 8px; }
+
+    textarea {
+      width: 100%;
+      border: 2px solid #d1dce6;
+      border-radius: 8px;
+      padding: 10px 13px;
+      font-size: 15px;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 68px;
+      background: #fafcff;
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+    textarea:focus { outline: none; border-color: var(--blau); }
+
+    details.tipp {
+      background: #fff8e1;
+      border-left: 4px solid #f9a825;
+      border-radius: 0 8px 8px 0;
+      padding: 9px 13px;
+      margin-top: 10px;
+    }
+    details.tipp summary { cursor: pointer; font-weight: 600; font-size: 0.86rem; color: #7a5500; }
+    details.tipp p { margin-top: 5px; font-size: 0.84rem; color: #5a4000; line-height: 1.5; }
+
+    /* ─── DROGERIE-TABELLE ─── */
+    .produkt-tabelle {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.87rem;
+      margin: 14px 0;
+    }
+    .produkt-tabelle th {
+      background: var(--blau);
+      color: white;
+      padding: 8px 12px;
+      text-align: left;
+      font-size: 0.77rem;
+      font-weight: 700;
+    }
+    .produkt-tabelle th:first-child { border-radius: 8px 0 0 0; }
+    .produkt-tabelle th:last-child  { border-radius: 0 8px 0 0; }
+    .produkt-tabelle td { padding: 9px 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
+    .produkt-tabelle tr:last-child td { border-bottom: none; }
+    .produkt-tabelle tr:nth-child(even) td { background: #f8fafc; }
+    .ph-chip {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.79rem;
+      white-space: nowrap;
+    }
+    .bewertung { font-size: 0.85rem; }
+
+    /* ─── REFLEXION ─── */
+    .reflex-raster {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .reflex-cell {
+      border-radius: 10px;
+      padding: 13px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .reflex-cell.neu    { background: #e3f2fd; }
+    .reflex-cell.klar   { background: #e8f5e9; }
+    .reflex-cell.offen  { background: #fff3e0; }
+    .reflex-cell.strat  { background: #f3e5f5; }
+    .reflex-cell label  { font-size: 0.77rem; font-weight: 800; color: #333; text-transform: uppercase; letter-spacing: 0.05em; }
+    .reflex-cell textarea { min-height: 62px; background: rgba(255,255,255,0.75); font-size: 14px; }
+
+    /* ─── ZIEL-RÜCKBLICK ─── */
+    .ziel-rueck-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 14px;
+      border-radius: 9px;
+      border: 2px solid #dde4ea;
+      background: white;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      transition: all 0.15s;
+    }
+    .ziel-rueck-item.ja  { border-color: var(--gruen); background: #e8f5e9; }
+    .ziel-rueck-item.halb{ border-color: #f9a825;      background: #fff8e1; }
+    .ziel-rueck-toggle {
+      display: flex; gap: 6px; flex-shrink: 0;
+    }
+    .toggle-btn {
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid #ccc;
+      background: white;
+      transition: all 0.15s;
+    }
+    .toggle-btn.aktiv-ja   { background: var(--gruen); color: white; border-color: var(--gruen); }
+    .toggle-btn.aktiv-halb { background: #f9a825;      color: white; border-color: #f9a825; }
+
+    /* ─── PRÄSENTATIONSBOX ─── */
+    .praes-box {
+      background: linear-gradient(135deg, var(--blau) 0%, var(--blau-hell) 100%);
+      color: white;
+      border-radius: 14px;
+      padding: 20px 22px;
+      margin-top: 10px;
+    }
+    .praes-box h3 { font-size: 1rem; margin-bottom: 10px; }
+    .praes-box ol { margin-left: 20px; line-height: 2.1; font-size: 0.9rem; opacity: 0.95; }
+
+    /* ─── NAV ─── */
+    .nav-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 22px; gap: 10px; flex-wrap: wrap;
+    }
+    .btn {
+      padding: 11px 22px;
+      border-radius: 9px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      min-height: 44px;
+      transition: opacity 0.2s;
+    }
+    .btn:active { opacity: 0.75; }
+    .btn-primary { background: var(--blau);   color: white; }
+    .btn-ghost   { background: transparent;   color: var(--blau); border: 2px solid var(--blau); }
+    .btn-gruen   { background: var(--gruen);  color: white; }
+
+    /* ─── SPEICHER-STATUS ─── */
+    .speicher-status { font-size: 0.74rem; color: var(--gruen); text-align: right; min-height: 16px; margin-top: 5px; }
+
+    /* ─── KOOPERATIONSHINWEIS ─── */
+    .koophinweis {
+      background: #f0f8ff;
+      border: 1.5px dashed var(--blau-hell);
+      border-radius: 10px;
+      padding: 11px 15px;
+      font-size: 0.83rem;
+      color: var(--blau);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 12px 16px; }
+      .container { padding: 16px 12px 50px; }
+      .phasen-leiste { padding: 8px 14px; }
+      .reflex-raster { grid-template-columns: 1fr; }
+      .koerper-vergleich { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🧴 pH-Wert – Haut &amp; Drogerieprodukte</h1>
+    <p>Chemie Klasse 10 · E-Kurs · Selbstreguliertes Lernen</p>
+  </div>
+  <div class="fach-badge">E-Kurs · NRW</div>
+</header>
+
+<div class="phasen-leiste">
+  <div class="phase-pip aktiv" id="pip-1"><div class="phase-dot">1</div>Planen</div>
+  <div class="phase-pfeil">›</div>
+  <div class="phase-pip" id="pip-2"><div class="phase-dot">2</div>Erkunden</div>
+  <div class="phase-pfeil">›</div>
+  <div class="phase-pip" id="pip-3"><div class="phase-dot">3</div>Aufgaben</div>
+  <div class="phase-pfeil">›</div>
+  <div class="phase-pip" id="pip-4"><div class="phase-dot">4</div>Transfer</div>
+  <div class="phase-pfeil">›</div>
+  <div class="phase-pip" id="pip-5"><div class="phase-dot">5</div>Reflexion</div>
+</div>
+
+<div class="container">
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SCREEN 1 – PLANEN                        -->
+<!-- ══════════════════════════════════════════ -->
+<div class="screen aktiv" id="screen-1">
+
+  <div class="srl-banner planen">
+    <div class="srl-icon">🎯</div>
+    <div class="srl-text">
+      <h3>Phase 1 – Planen</h3>
+      <p>Aktiviere zuerst dein Vorwissen. Dann setzt du dir ein Ziel für heute. Was weißt du schon – und was willst du verstehen?</p>
+    </div>
+  </div>
+
+  <div class="koophinweis">
+    🤝 <span><strong>Gegenseitiges Helfen ist ausdrücklich erwünscht.</strong> Ihr arbeitet jede/r für sich – aber wenn du feststeckst oder jemanden fragst, ist das kein Schummeln, sondern gutes Lernen.</span>
+  </div>
+
+  <div class="card">
+    <h2>💭 Vorwissen aktivieren</h2>
+
+    <div class="vw-box">
+      <label>Was weißt du über pH-Werte? Was bedeutet ein niedriger pH-Wert – und was ein hoher? Schreib in 1–2 Sätzen.</label>
+      <textarea id="vw1" rows="2" placeholder="Mein Vorwissen: …"></textarea>
+    </div>
+
+    <div class="vw-box warn">
+      <label>Du hast bestimmt schon mal ein Produkt gesehen mit dem Aufdruck „pH-hautneutral". Was glaubst du: Was bedeutet das genau?</label>
+      <textarea id="vw2" rows="2" placeholder="Meine Vermutung: …"></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🎯 Mein Lernziel für heute</h2>
+    <p style="font-size:0.84rem;color:#666;margin-bottom:12px;">Was willst du am Ende dieser Stunde können? Wähle aus – du kannst mehrere ankreuzen.</p>
+    <div class="ziele" id="ziele">
+      <div class="ziel-item" data-ziel="0"><div class="ziel-box"></div>Ich kann erklären, warum die Haut einen sauren pH-Wert hat.</div>
+      <div class="ziel-item" data-ziel="1"><div class="ziel-box"></div>Ich kann beschreiben, was passiert, wenn der Haut-pH zu basisch wird.</div>
+      <div class="ziel-item" data-ziel="2"><div class="ziel-box"></div>Ich kann verschiedene Körperbereiche mit ihren pH-Werten vergleichen.</div>
+      <div class="ziel-item" data-ziel="3"><div class="ziel-box"></div>Ich kann die Aussage „pH-hautneutral" auf einem Produkt chemisch einordnen und bewerten.</div>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <span></span>
+    <button class="btn btn-primary" id="btn-1-2">Weiter: Infotext lesen →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SCREEN 2 – ERKUNDEN (INFOTEXT)           -->
+<!-- ══════════════════════════════════════════ -->
+<div class="screen" id="screen-2">
+
+  <div class="srl-banner tun">
+    <div class="srl-icon">📖</div>
+    <div class="srl-text">
+      <h3>Phase 2 – Erkunden</h3>
+      <p>Lies den Text sorgfältig. Markiere Stellen, die zu den Aufgaben passen – so weißt du später genau, wo du nachlesen kannst.</p>
+    </div>
+  </div>
+
+  <div class="card info">
+    <div class="info-label">📄 Infotext – lies ihn komplett, bevor du mit den Aufgaben beginnst</div>
+    <h2 style="color:var(--blau); margin-bottom:12px;">🧬 pH-Werte im Körper – und was das mit deiner Haut zu tun hat</h2>
+
+    <div class="marker-toolbar" id="marker-toolbar">
+      <span class="tlabel">✏️ Markieren:</span>
+      <button class="marker-btn" data-farbe="0" style="background:#FFF176;border-color:#F9A825;">✏️ Aufgabe 1</button>
+      <button class="marker-btn" data-farbe="1" style="background:#C8F5B0;border-color:#43A047;">✏️ Aufgabe 2</button>
+      <button class="marker-btn" data-farbe="2" style="background:#B3E5FC;border-color:#0288D1;">✏️ Aufgabe 3</button>
+      <button class="marker-btn" data-farbe="3" style="background:#FFCDD2;border-color:#E53935;">✏️ Aufgabe 4</button>
+      <button class="marker-btn radieren" data-farbe="radieren">🧹 Löschen</button>
+    </div>
+
+    <div id="infotext-inhalt">
+      <p>Der menschliche Körper besteht nicht aus einem einzigen chemischen Milieu – jeder Bereich hat seinen eigenen, spezifisch regulierten pH-Wert. Diese Unterschiede sind kein Zufall, sondern chemische Notwendigkeit:</p>
+
+      <div class="koerper-vergleich">
+        <div class="kb-box haut">
+          <div class="kb-titel">🖐 Haut</div>
+          <div class="kb-ph">pH 4,5–5,5</div>
+          <div class="kb-info">Säureschutzmantel – schützt vor Keimen</div>
+        </div>
+        <div class="kb-box magen">
+          <div class="kb-titel">🫀 Magen</div>
+          <div class="kb-ph">pH 1–2</div>
+          <div class="kb-info">Salzsäure – tötet Bakterien, aktiviert Enzyme</div>
+        </div>
+        <div class="kb-box blut">
+          <div class="kb-titel">🩸 Blut</div>
+          <div class="kb-ph">pH 7,35–7,45</div>
+          <div class="kb-info">Eng kontrolliert – lebensnotwendig</div>
+        </div>
+        <div class="kb-box speichel">
+          <div class="kb-titel">🦷 Speichel</div>
+          <div class="kb-ph">pH 6,5–7</div>
+          <div class="kb-info">Puffert Säuren – schützt Zahnschmelz</div>
+        </div>
+      </div>
+
+      <p><strong>Der Magen</strong> arbeitet bei pH 1–2 – das ist hochgradig sauer. Diese Salzsäure tötet Krankheitserreger und aktiviert das Verdauungsenzym Pepsin, das nur in saurem Milieu funktioniert. Eine Schutzschleimhaut verhindert, dass sich der Magen selbst verdaut. Das Blut hingegen muss auf pH 7,35–7,45 gehalten werden – eine Abweichung von nur 0,1 kann lebensbedrohlich sein, weil Enzyme und Proteine ihre Form verlieren.</p>
+
+      <p><strong>Die Haut</strong> hat einen pH-Wert von <strong>4,5 bis 5,5</strong> – deutlich sauer. Dieser sogenannte <strong>Säureschutzmantel</strong> ist eine chemische Barriere: Er besteht aus Schweißsekret, Talg und Stoffwechselprodukten der auf der Haut lebenden nützlichen Bakterien. Viele Krankheitserreger können in diesem sauren Milieu nicht überleben oder sich kaum vermehren.</p>
+
+      <p>Die Haut reguliert diesen pH-Wert aktiv: Schweißdrüsen und Talgdrüsen produzieren ständig saure Substanzen. Wird der Säureschutzmantel gestört – zum Beispiel durch häufiges Waschen mit stark basischer Seife (pH 9–10) – steigt der Haut-pH vorübergehend an. Die Haut braucht dann etwa <strong>2 Stunden</strong>, um ihren normalen pH wiederherzustellen. In dieser Zeit ist sie anfälliger für Keime und Austrocknung.</p>
+
+      <p>Bei der Erkrankung <strong>Neurodermitis</strong> ist der Säureschutzmantel dauerhaft gestört: Die betroffene Haut hat oft einen pH-Wert von 6 oder höher. Die Folge: Trockene, schuppige Haut, Entzündungen und erhöhte Infektionsanfälligkeit. Klar, dass Pflegeprodukte hier eine wichtige Rolle spielen.</p>
+
+      <p><strong>Was heißt das für Drogerieprodukte?</strong> Ein Produkt mit dem Aufdruck „pH-neutral" hat pH 7 – das klingt zunächst harmlos. Für die Haut ist pH 7 aber zu basisch: Es greift den Säureschutzmantel an. „pH-hautneutral" meint dagegen nicht pH 7, sondern pH ≈ 5 – also den pH der Haut selbst. Der Begriff ist also keine Chemieaussage, sondern eine Marketingformulierung. Ob ein Produkt tatsächlich zum Haut-pH passt, steht auf der Verpackung – wenn man weiß, wonach man sucht.</p>
+    </div>
+
+    <p class="marker-hinweis">💡 Text auswählen → Aufgabenfarbe klicken. Auf eine Markierung tippen + 🧹 zum Entfernen.</p>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" id="btn-2-1">← Planen</button>
+    <button class="btn btn-primary" id="btn-2-3">Weiter: Aufgaben →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SCREEN 3 – AUFGABEN                      -->
+<!-- ══════════════════════════════════════════ -->
+<div class="screen" id="screen-3">
+
+  <div class="srl-banner tun">
+    <div class="srl-icon">✏️</div>
+    <div class="srl-text">
+      <h3>Phase 3 – Aufgaben bearbeiten</h3>
+      <p>Bearbeite die Schritte der Reihe nach. Nutze den Infotext und deine Markierungen. Du kommst mit dem Pfeil oben links jederzeit zurück.</p>
+    </div>
+  </div>
+
+  <div class="koophinweis">🤝 Steckst du fest? Frag jemanden neben dir oder schau in den Infotext zurück.</div>
+
+  <div class="card">
+    <h2>📋 Aufgaben – Schritt für Schritt</h2>
+
+    <!-- Aufgabe 1 – gelb -->
+    <div class="schritt">
+      <div class="schritt-nr" style="background:#FFF176;border:2px solid #F9A825;">1</div>
+      <div class="schritt-inhalt">
+        <div class="schritt-titel">Haut einordnen</div>
+        <div class="schritt-frage">Die Haut hat pH 4,5–5,5. Ist das sauer, neutral oder basisch? Erkläre in 2–3 Sätzen, warum genau dieser pH-Wert sinnvoll ist und wie er entsteht.</div>
+        <textarea id="a1" rows="3" placeholder="Deine Antwort …"></textarea>
+        <details class="tipp">
+          <summary>💡 Tipp anzeigen</summary>
+          <p>Schau auf die farbigen Körperbereich-Kästchen im Infotext. Was steht beim Stichwort „Säureschutzmantel"? Welche Funktion hat er?</p>
+        </details>
+      </div>
+    </div>
+
+    <!-- Aufgabe 2 – grün -->
+    <div class="schritt">
+      <div class="schritt-nr" style="background:#C8F5B0;border:2px solid #43A047;">2</div>
+      <div class="schritt-inhalt">
+        <div class="schritt-titel">Vergleich mit anderen Körperbereichen</div>
+        <div class="schritt-frage">Magen (pH 1–2), Blut (pH 7,35–7,45) und Speichel (pH 6,5–7) haben alle verschiedene pH-Werte. Wähle zwei davon aus und erkläre: Warum braucht dieser Körperbereich genau diesen pH-Wert? Was wäre, wenn er falsch wäre?</div>
+        <textarea id="a2" rows="4" placeholder="Körperbereich 1: … | Körperbereich 2: …"></textarea>
+        <details class="tipp">
+          <summary>💡 Tipp anzeigen</summary>
+          <p>Im Infotext sind alle vier Bereiche beschrieben. Beim Blut steht, was passiert, wenn der pH-Wert um 0,1 abweicht. Beim Magen steht, welche Aufgabe die Salzsäure hat.</p>
+        </details>
+      </div>
+    </div>
+
+    <!-- Aufgabe 3 – blau -->
+    <div class="schritt">
+      <div class="schritt-nr" style="background:#B3E5FC;border:2px solid #0288D1;">3</div>
+      <div class="schritt-inhalt">
+        <div class="schritt-titel">Was passiert, wenn der Haut-pH gestört wird?</div>
+        <div class="schritt-frage">Normale Seife hat pH 9–10. Was passiert mit dem Säureschutzmantel der Haut, wenn man sich täglich damit wäscht? Erkläre den chemischen Vorgang und nenne zwei mögliche Folgen für die Haut.</div>
+        <textarea id="a3" rows="3" placeholder="Deine Antwort …"></textarea>
+        <details class="tipp">
+          <summary>💡 Tipp anzeigen</summary>
+          <p>Seife ist basisch. Was passiert bei einer Neutralisation zwischen Säure (Haut) und Base (Seife)? Wie lange braucht die Haut, um sich zu erholen?</p>
+        </details>
+      </div>
+    </div>
+
+    <!-- Aufgabe 4 – rot -->
+    <div class="schritt">
+      <div class="schritt-nr" style="background:#FFCDD2;border:2px solid #E53935;">4</div>
+      <div class="schritt-inhalt">
+        <div class="schritt-titel">Verbindung zur letzten Stunde</div>
+        <div class="schritt-frage">In der letzten Stunde habt ihr Neutralisation untersucht. Erkläre mit der Neutralisationsformel H⁺ + OH⁻ → H₂O, was passiert, wenn basische Seife auf den sauren Säureschutzmantel der Haut trifft.</div>
+        <textarea id="a4" rows="3" placeholder="Deine Erklärung mit der Formel …"></textarea>
+        <details class="tipp">
+          <summary>💡 Tipp anzeigen</summary>
+          <p>Der Säureschutzmantel enthält H⁺-Ionen (sauer). Basische Seife enthält OH⁻-Ionen. Was passiert, wenn diese aufeinandertreffen? Was entsteht? Was geht dabei verloren?</p>
+        </details>
+      </div>
+    </div>
+
+    <div class="speicher-status" id="sp3"></div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" id="btn-3-2">← Infotext</button>
+    <button class="btn btn-primary" id="btn-3-4">Weiter: Drogerieprodukte →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SCREEN 4 – TRANSFER (DROGERIEPRODUKTE)   -->
+<!-- ══════════════════════════════════════════ -->
+<div class="screen" id="screen-4">
+
+  <div class="srl-banner tun">
+    <div class="srl-icon">🛒</div>
+    <div class="srl-text">
+      <h3>Phase 4 – Transfer</h3>
+      <p>Wende dein Wissen jetzt auf reale Produkte an. Was versprechen Hersteller – und was steckt chemisch dahinter?</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🏪 Drogerieprodukte unter der Lupe</h2>
+    <p>Alle diese Produkte kommen auf die Haut. Der natürliche Haut-pH liegt bei <strong>4,5–5,5</strong>. Schau dir die Produkte genau an:</p>
+
+    <table class="produkt-tabelle">
+      <thead>
+        <tr>
+          <th>Produkt</th>
+          <th>Werbeaussage</th>
+          <th>Tatsächlicher pH</th>
+          <th>Bewertung für Haut</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Normale Kernseife</strong></td>
+          <td>–</td>
+          <td><span class="ph-chip" style="background:#fde8e8;color:#c0392b;">pH 9–10</span></td>
+          <td class="bewertung">❌ Greift Säureschutzmantel stark an</td>
+        </tr>
+        <tr>
+          <td><strong>Dove Cremeseife</strong></td>
+          <td>„pH-neutral"</td>
+          <td><span class="ph-chip" style="background:#fff3e0;color:#bf6000;">pH 7</span></td>
+          <td class="bewertung">⚠️ Immer noch zu basisch für Haut</td>
+        </tr>
+        <tr>
+          <td><strong>Sebamed Waschlotion</strong></td>
+          <td>„pH 6,8"</td>
+          <td><span class="ph-chip" style="background:#e8f5e9;color:#2e7d32;">pH 6,8</span></td>
+          <td class="bewertung">✅ Deutlich besser – nah am Hautniveau</td>
+        </tr>
+        <tr>
+          <td><strong>Sebamed pH 5.5 Waschlotion</strong></td>
+          <td>„pH 5,5 – hautneutral"</td>
+          <td><span class="ph-chip" style="background:#e8f5e9;color:#2e7d32;">pH 5,5</span></td>
+          <td class="bewertung">✅✅ Optimal – entspricht Haut-pH</td>
+        </tr>
+        <tr>
+          <td><strong>Duschgel (Durchschnitt)</strong></td>
+          <td>„mild und pflegend"</td>
+          <td><span class="ph-chip" style="background:#fff3e0;color:#bf6000;">pH 6–7</span></td>
+          <td class="bewertung">⚠️ Leicht zu basisch</td>
+        </tr>
+        <tr>
+          <td><strong>Shampoo (Durchschnitt)</strong></td>
+          <td>verschiedene</td>
+          <td><span class="ph-chip" style="background:#e8f5e9;color:#2e7d32;">pH 4,5–6</span></td>
+          <td class="bewertung">✅ Gut angepasst – Kopfhaut ähnlich wie Haut</td>
+        </tr>
+        <tr>
+          <td><strong>Babyshampoo</strong></td>
+          <td>„extra mild, pH-neutral"</td>
+          <td><span class="ph-chip" style="background:#fff3e0;color:#bf6000;">pH 7</span></td>
+          <td class="bewertung">⚠️ Zu basisch – trotz „mild"-Versprechen</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>❓ Transfer-Aufgaben</h2>
+
+    <div class="schritt">
+      <div class="schritt-nr" style="background:#e8f0fe;border:2px solid var(--plan-rand);">T1</div>
+      <div class="schritt-inhalt">
+        <div class="schritt-titel">„pH-neutral" vs. „pH-hautneutral"</div>
+        <div class="schritt-frage">Dove wirbt mit „pH-neutral" (pH 7). Erkläre in 2–3 Sätzen, warum das chemisch gesehen trotzdem nicht ideal für die Haut ist – obwohl pH 7 neutral klingt.</div>
+        <textarea id="t1" rows="3" placeholder="Meine Erklärung …"></textarea>
+        <details class="tipp">
+          <summary>💡 Tipp anzeigen</summary>
+          <p>pH-neutral bedeutet pH 7 – das ist die Mitte der Skala. Aber die Haut hat pH 4,5–5,5. Ist pH 7 für die Haut sauer oder basisch? Was passiert mit dem Säureschutzmantel?</p>
+        </details>
+      </div>
+    </div>
+
+    <div class="schritt">
+      <div class="schritt-nr" style="background:#e8f0fe;border:2px solid var(--plan-rand);">T2</div>
+      <div class="schritt-inhalt">
+        <div class="schritt-titel">Empfehlung begründen</div>
+        <div class="schritt-frage">Welches Produkt aus der Tabelle würdest du jemandem mit empfindlicher oder zu Neurodermitis neigender Haut empfehlen? Begründe mit dem pH-Wert.</div>
+        <textarea id="t2" rows="2" placeholder="Meine Empfehlung: …"></textarea>
+      </div>
+    </div>
+
+    <div class="schritt">
+      <div class="schritt-nr" style="background:#e8f0fe;border:2px solid var(--plan-rand);">T3</div>
+      <div class="schritt-inhalt">
+        <div class="schritt-titel">Kritisch denken</div>
+        <div class="schritt-frage">Babyshampoo wird als „extra mild" und „pH-neutral" beworben. Ist das für Babyhaut (pH ≈ 5) wirklich mild? Was sagt die Chemie – und was sagt die Werbung?</div>
+        <textarea id="t3" rows="3" placeholder="Chemie sagt … | Werbung sagt …"></textarea>
+        <details class="tipp">
+          <summary>💡 Tipp anzeigen</summary>
+          <p>„pH-neutral" bedeutet pH 7. Babyhaut hat ähnlichen pH wie Erwachsenenhaut. Ist pH 7 für die Haut wirklich neutral – oder ist das Werbung?</p>
+        </details>
+      </div>
+    </div>
+
+    <div class="speicher-status" id="sp4"></div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" id="btn-4-3">← Aufgaben</button>
+    <button class="btn btn-primary" id="btn-4-5">Weiter: Reflexion →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SCREEN 5 – REFLEXION                     -->
+<!-- ══════════════════════════════════════════ -->
+<div class="screen" id="screen-5">
+
+  <div class="srl-banner reflek">
+    <div class="srl-icon">🔍</div>
+    <div class="srl-text">
+      <h3>Phase 5 – Reflexion</h3>
+      <p>Schau zurück auf deine Ziele vom Anfang. Was hast du erreicht? Was war schwierig? Was nimmst du für den nächsten Kauf im Drogeriemarkt mit?</p>
+    </div>
+  </div>
+
+  <!-- Ziel-Rückblick -->
+  <div class="card">
+    <h2>🎯 Habe ich meine Ziele erreicht?</h2>
+    <p style="font-size:0.84rem;color:#666;margin-bottom:14px;">Bewerte ehrlich – klick auf ✓ wenn du dir sicher bist, auf ~ wenn du noch unsicher bist.</p>
+    <div id="ziel-rueckblick">
+      <div class="ziel-rueck-item" data-rueck="0">
+        <div class="ziel-rueck-toggle">
+          <button class="toggle-btn" data-ziel="0" data-typ="ja">✓ Ja</button>
+          <button class="toggle-btn" data-ziel="0" data-typ="halb">~ Halb</button>
+        </div>
+        Ich kann erklären, warum die Haut einen sauren pH-Wert hat.
+      </div>
+      <div class="ziel-rueck-item" data-rueck="1">
+        <div class="ziel-rueck-toggle">
+          <button class="toggle-btn" data-ziel="1" data-typ="ja">✓ Ja</button>
+          <button class="toggle-btn" data-ziel="1" data-typ="halb">~ Halb</button>
+        </div>
+        Ich kann beschreiben, was passiert, wenn der Haut-pH zu basisch wird.
+      </div>
+      <div class="ziel-rueck-item" data-rueck="2">
+        <div class="ziel-rueck-toggle">
+          <button class="toggle-btn" data-ziel="2" data-typ="ja">✓ Ja</button>
+          <button class="toggle-btn" data-ziel="2" data-typ="halb">~ Halb</button>
+        </div>
+        Ich kann verschiedene Körperbereiche mit ihren pH-Werten vergleichen.
+      </div>
+      <div class="ziel-rueck-item" data-rueck="3">
+        <div class="ziel-rueck-toggle">
+          <button class="toggle-btn" data-ziel="3" data-typ="ja">✓ Ja</button>
+          <button class="toggle-btn" data-ziel="3" data-typ="halb">~ Halb</button>
+        </div>
+        Ich kann „pH-hautneutral" auf einem Produkt chemisch einordnen und bewerten.
+      </div>
+    </div>
+  </div>
+
+  <!-- Reflexionsraster -->
+  <div class="card">
+    <h2>📝 Mein Lernrückblick</h2>
+    <div class="reflex-raster">
+      <div class="reflex-cell neu">
+        <label>💡 Das war neu für mich …</label>
+        <textarea id="r1" rows="3" placeholder="Schreib hier …"></textarea>
+      </div>
+      <div class="reflex-cell klar">
+        <label>✅ Das habe ich gut verstanden …</label>
+        <textarea id="r2" rows="3" placeholder="Schreib hier …"></textarea>
+      </div>
+      <div class="reflex-cell offen">
+        <label>❓ Das verstehe ich noch nicht ganz …</label>
+        <textarea id="r3" rows="3" placeholder="Schreib hier …"></textarea>
+      </div>
+      <div class="reflex-cell strat">
+        <label>🛠 Das hat mir beim Lernen geholfen …</label>
+        <textarea id="r4" rows="3" placeholder="z.B. Markieren, Tipps, jemanden fragen …"></textarea>
+      </div>
+    </div>
+    <div class="speicher-status" id="sp5"></div>
+  </div>
+
+  <!-- Abschlussfrage -->
+  <div class="card">
+    <h2>🛒 Mein nächster Einkauf</h2>
+    <p style="font-size:0.84rem;color:#666;margin-bottom:10px;">Eine letzte Frage zum Mitnehmen:</p>
+    <div class="schritt" style="padding-top:0;border-bottom:none;padding-bottom:0;">
+      <div class="schritt-inhalt">
+        <div class="schritt-frage">Du stehst im Drogeriemarkt vor dem Regal. Auf welche pH-Angabe achtest du jetzt bei Seife oder Duschgel – und warum? Schreib in 2–3 Sätzen.</div>
+        <textarea id="abschluss" rows="3" placeholder="Ab jetzt achte ich auf …"></textarea>
+      </div>
+    </div>
+    <div class="speicher-status" id="sp-abschluss"></div>
+  </div>
+
+  <!-- Präsentationsvorbereitung -->
+  <div class="praes-box">
+    <h3>📢 Für die Diskussion im Plenum – das solltest du erklären können:</h3>
+    <ol>
+      <li>Warum hat die Haut pH 4,5–5,5?</li>
+      <li>Was macht basische Seife mit dem Säureschutzmantel?</li>
+      <li>Warum ist „pH-neutral" (pH 7) auf Kosmetik irreführend?</li>
+      <li>Welches Produkt aus der Tabelle würdest du empfehlen – und warum?</li>
+    </ol>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ─── HIGHLIGHTER ─────────────────────────────────────────────────────────────
+const HL = [
+  { bg: '#FFF176', rand: '#F9A825' },
+  { bg: '#C8F5B0', rand: '#43A047' },
+  { bg: '#B3E5FC', rand: '#0288D1' },
+  { bg: '#FFCDD2', rand: '#E53935' },
+];
+let aktiveFarbe = null;
+
+function initHighlighter() {
+  const toolbar  = document.getElementById('marker-toolbar');
+  const infotext = document.getElementById('infotext-inhalt');
+
+  toolbar.querySelectorAll('.marker-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const f = this.dataset.farbe;
+      const gleich = f === 'radieren' ? aktiveFarbe === 'radieren'
+                                       : aktiveFarbe === parseInt(f);
+      aktiveFarbe = gleich ? null : (f === 'radieren' ? 'radieren' : parseInt(f));
+      toolbar.querySelectorAll('.marker-btn').forEach(b => b.classList.remove('aktiv'));
+      if (aktiveFarbe !== null) this.classList.add('aktiv');
+    });
+  });
+
+  infotext.addEventListener('mouseup', markiere);
+  infotext.addEventListener('touchend', markiere);
+
+  infotext.addEventListener('click', function(e) {
+    if (aktiveFarbe !== 'radieren') return;
+    const hl = e.target.closest('.hl');
+    if (!hl) return;
+    const p = hl.parentNode;
+    while (hl.firstChild) p.insertBefore(hl.firstChild, hl);
+    p.removeChild(hl);
+    p.normalize();
+    opSpeichern('highlights', infotext.innerHTML);
+  });
+}
+
+function markiere() {
+  if (aktiveFarbe === null || aktiveFarbe === 'radieren') return;
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+  const infotext = document.getElementById('infotext-inhalt');
+  const range = sel.getRangeAt(0);
+  if (!infotext.contains(range.commonAncestorContainer)) return;
+  const f = HL[aktiveFarbe];
+  const span = document.createElement('span');
+  span.className = 'hl';
+  span.style.backgroundColor = f.bg;
+  span.style.borderBottom = '2.5px solid ' + f.rand;
+  try { range.surroundContents(span); }
+  catch(e) { const frag = range.extractContents(); span.appendChild(frag); range.insertNode(span); }
+  sel.removeAllRanges();
+  opSpeichern('highlights', infotext.innerHTML);
+}
+
+// ─── SPEICHER ────────────────────────────────────────────────────────────────
+const SK = 'phkoerper2_';
+function opSpeichern(k, v) { try { localStorage.setItem(SK + k, v); } catch(e) {} }
+function opLaden(k)        { try { return localStorage.getItem(SK + k) || ''; } catch(e) { return ''; } }
+
+function autoSave(id, key, statusId) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.value = opLaden(key);
+  el.addEventListener('input', function() {
+    opSpeichern(key, this.value);
+    const s = document.getElementById(statusId);
+    if (s) { s.textContent = '✓ Gespeichert'; setTimeout(() => s.textContent = '', 1800); }
+  });
+}
+
+// ─── PHASENLEISTE ────────────────────────────────────────────────────────────
+function setzePhase(n) {
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById('pip-' + i);
+    if (!el) continue;
+    el.classList.remove('aktiv', 'fertig');
+    if (i === n) el.classList.add('aktiv');
+    else if (i < n) el.classList.add('fertig');
+  }
+}
+
+function zeigeScreen(n) {
+  document.querySelectorAll('.screen').forEach((s, i) => {
+    s.classList.toggle('aktiv', i + 1 === n);
+  });
+  setzePhase(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── ZIEL-CHECKBOXEN ─────────────────────────────────────────────────────────
+function initZiele() {
+  const gespeichert = JSON.parse(opLaden('ziele') || '{}');
+  document.querySelectorAll('#ziele .ziel-item').forEach(item => {
+    const z = item.dataset.ziel;
+    if (gespeichert[z]) { item.classList.add('checked'); item.querySelector('.ziel-box').textContent = '✓'; }
+    item.addEventListener('click', function() {
+      this.classList.toggle('checked');
+      this.querySelector('.ziel-box').textContent = this.classList.contains('checked') ? '✓' : '';
+      const d = {};
+      document.querySelectorAll('#ziele .ziel-item').forEach(it => { d[it.dataset.ziel] = it.classList.contains('checked'); });
+      opSpeichern('ziele', JSON.stringify(d));
+    });
+  });
+}
+
+// ─── ZIEL-RÜCKBLICK ──────────────────────────────────────────────────────────
+function initRueckblick() {
+  const gespeichert = JSON.parse(opLaden('rueckblick') || '{}');
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    const ziel = btn.dataset.ziel;
+    const typ  = btn.dataset.typ;
+    if (gespeichert[ziel] === typ) btn.classList.add('aktiv-' + typ);
+    btn.addEventListener('click', function() {
+      const row = document.querySelector('.ziel-rueck-item[data-rueck="' + ziel + '"]');
+      row.querySelectorAll('.toggle-btn').forEach(b => {
+        b.classList.remove('aktiv-ja', 'aktiv-halb');
+      });
+      this.classList.add('aktiv-' + typ);
+      row.classList.remove('ja','halb');
+      row.classList.add(typ);
+      const d = JSON.parse(opLaden('rueckblick') || '{}');
+      d[ziel] = typ;
+      opSpeichern('rueckblick', JSON.stringify(d));
+    });
+  });
+  // Restore states
+  Object.entries(gespeichert).forEach(([ziel, typ]) => {
+    const row = document.querySelector('.ziel-rueck-item[data-rueck="' + ziel + '"]');
+    if (row) row.classList.add(typ);
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  initHighlighter();
+  initZiele();
+  initRueckblick();
+
+  // Highlights laden
+  const gesHL = opLaden('highlights');
+  if (gesHL) document.getElementById('infotext-inhalt').innerHTML = gesHL;
+
+  // Alle Felder mit Auto-Save verdrahten
+  [['vw1','vw1',''], ['vw2','vw2','']].forEach(([id,k]) => autoSave(id,k,''));
+  [['a1','a1','sp3'],['a2','a2','sp3'],['a3','a3','sp3'],['a4','a4','sp3']].forEach(([id,k,s]) => autoSave(id,k,s));
+  [['t1','t1','sp4'],['t2','t2','sp4'],['t3','t3','sp4']].forEach(([id,k,s]) => autoSave(id,k,s));
+  [['r1','r1','sp5'],['r2','r2','sp5'],['r3','r3','sp5'],['r4','r4','sp5']].forEach(([id,k,s]) => autoSave(id,k,s));
+  autoSave('abschluss','abschluss','sp-abschluss');
+
+  // Navigations-Buttons
+  const nav = {
+    'btn-1-2': 2, 'btn-2-1': 1, 'btn-2-3': 3,
+    'btn-3-2': 2, 'btn-3-4': 4,
+    'btn-4-3': 3, 'btn-4-5': 5
+  };
+  Object.entries(nav).forEach(([id, ziel]) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', () => zeigeScreen(ziel));
+  });
+});
+</script>
+</body>
+</html>
